@@ -30,7 +30,7 @@ namespace MODBUS_Communicator
         private void InitializeComponent()
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.MasterPage = new System.Windows.Forms.TabPage();
             this.label7 = new System.Windows.Forms.Label();
             this.Master_RecievedText = new System.Windows.Forms.RichTextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -56,7 +56,7 @@ namespace MODBUS_Communicator
             this.whichInstruction = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.Master_SlaveAddress = new System.Windows.Forms.RichTextBox();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.SlavePage = new System.Windows.Forms.TabPage();
             this.label17 = new System.Windows.Forms.Label();
             this.Slave_RecievedText = new System.Windows.Forms.RichTextBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
@@ -73,13 +73,13 @@ namespace MODBUS_Communicator
             this.label11 = new System.Windows.Forms.Label();
             this.Slave_Time_Interval_Bar = new System.Windows.Forms.TrackBar();
             this.tabControl1.SuspendLayout();
-            this.tabPage1.SuspendLayout();
+            this.MasterPage.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Master_Time_Interval_Bar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Retransmissions_Bar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Timeout_Bar)).BeginInit();
             this.groupBox1.SuspendLayout();
-            this.tabPage2.SuspendLayout();
+            this.SlavePage.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Slave_Time_Interval_Bar)).BeginInit();
@@ -87,8 +87,8 @@ namespace MODBUS_Communicator
             // 
             // tabControl1
             // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.MasterPage);
+            this.tabControl1.Controls.Add(this.SlavePage);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
@@ -96,19 +96,19 @@ namespace MODBUS_Communicator
             this.tabControl1.Size = new System.Drawing.Size(800, 450);
             this.tabControl1.TabIndex = 0;
             // 
-            // tabPage1
+            // MasterPage
             // 
-            this.tabPage1.BackColor = System.Drawing.Color.LightCyan;
-            this.tabPage1.Controls.Add(this.label7);
-            this.tabPage1.Controls.Add(this.Master_RecievedText);
-            this.tabPage1.Controls.Add(this.groupBox2);
-            this.tabPage1.Controls.Add(this.groupBox1);
-            this.tabPage1.Location = new System.Drawing.Point(4, 24);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(792, 422);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Master";
+            this.MasterPage.BackColor = System.Drawing.Color.LightCyan;
+            this.MasterPage.Controls.Add(this.label7);
+            this.MasterPage.Controls.Add(this.Master_RecievedText);
+            this.MasterPage.Controls.Add(this.groupBox2);
+            this.MasterPage.Controls.Add(this.groupBox1);
+            this.MasterPage.Location = new System.Drawing.Point(4, 24);
+            this.MasterPage.Name = "MasterPage";
+            this.MasterPage.Padding = new System.Windows.Forms.Padding(3);
+            this.MasterPage.Size = new System.Drawing.Size(792, 422);
+            this.MasterPage.TabIndex = 0;
+            this.MasterPage.Text = "Master";
             // 
             // label7
             // 
@@ -123,6 +123,7 @@ namespace MODBUS_Communicator
             // 
             this.Master_RecievedText.Location = new System.Drawing.Point(439, 25);
             this.Master_RecievedText.Name = "Master_RecievedText";
+            this.Master_RecievedText.ReadOnly = true;
             this.Master_RecievedText.Size = new System.Drawing.Size(345, 389);
             this.Master_RecievedText.TabIndex = 6;
             this.Master_RecievedText.Text = "";
@@ -165,15 +166,18 @@ namespace MODBUS_Communicator
             this.Master_Port.Name = "Master_Port";
             this.Master_Port.Size = new System.Drawing.Size(155, 23);
             this.Master_Port.TabIndex = 15;
+            this.Master_Port.SelectedIndexChanged += new System.EventHandler(this.Master_Port_SelectedIndexChanged);
             // 
             // buttonMasterConnect
             // 
+            this.buttonMasterConnect.Enabled = false;
             this.buttonMasterConnect.Location = new System.Drawing.Point(7, 363);
             this.buttonMasterConnect.Name = "buttonMasterConnect";
             this.buttonMasterConnect.Size = new System.Drawing.Size(155, 39);
             this.buttonMasterConnect.TabIndex = 14;
             this.buttonMasterConnect.Text = "Connect as Master";
             this.buttonMasterConnect.UseVisualStyleBackColor = true;
+            this.buttonMasterConnect.Click += new System.EventHandler(this.buttonMasterConnect_Click);
             // 
             // Master_Time_Interval_Text
             // 
@@ -188,11 +192,11 @@ namespace MODBUS_Communicator
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(6, 212);
+            this.label6.Location = new System.Drawing.Point(7, 217);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(75, 15);
+            this.label6.Size = new System.Drawing.Size(102, 15);
             this.label6.TabIndex = 12;
-            this.label6.Text = "Time interval";
+            this.label6.Text = "Time interval [ms]";
             // 
             // Master_Time_Interval_Bar
             // 
@@ -204,7 +208,9 @@ namespace MODBUS_Communicator
             this.Master_Time_Interval_Bar.Size = new System.Drawing.Size(156, 45);
             this.Master_Time_Interval_Bar.SmallChange = 10;
             this.Master_Time_Interval_Bar.TabIndex = 13;
+            this.Master_Time_Interval_Bar.TickFrequency = 10;
             this.Master_Time_Interval_Bar.Value = 500;
+            this.Master_Time_Interval_Bar.Scroll += new System.EventHandler(this.Master_Time_Interval_Bar_Scroll);
             // 
             // Retransmissions_Text
             // 
@@ -219,7 +225,7 @@ namespace MODBUS_Communicator
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(5, 114);
+            this.label5.Location = new System.Drawing.Point(5, 118);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(92, 15);
             this.label5.TabIndex = 9;
@@ -235,6 +241,7 @@ namespace MODBUS_Communicator
             this.Retransmissions_Bar.Size = new System.Drawing.Size(156, 45);
             this.Retransmissions_Bar.TabIndex = 10;
             this.Retransmissions_Bar.Value = 2;
+            this.Retransmissions_Bar.Scroll += new System.EventHandler(this.Retransmissions_Bar_Scroll);
             // 
             // Timeout_Text
             // 
@@ -249,11 +256,11 @@ namespace MODBUS_Communicator
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(5, 15);
+            this.label4.Location = new System.Drawing.Point(6, 19);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(51, 15);
+            this.label4.Size = new System.Drawing.Size(78, 15);
             this.label4.TabIndex = 6;
-            this.label4.Text = "Timeout";
+            this.label4.Text = "Timeout [ms]";
             // 
             // Timeout_Bar
             // 
@@ -265,7 +272,9 @@ namespace MODBUS_Communicator
             this.Timeout_Bar.Size = new System.Drawing.Size(157, 45);
             this.Timeout_Bar.SmallChange = 100;
             this.Timeout_Bar.TabIndex = 7;
+            this.Timeout_Bar.TickFrequency = 100;
             this.Timeout_Bar.Value = 500;
+            this.Timeout_Bar.Scroll += new System.EventHandler(this.Timeout_Bar_Scroll);
             // 
             // groupBox1
             // 
@@ -302,15 +311,18 @@ namespace MODBUS_Communicator
             this.TransmissionType.Name = "TransmissionType";
             this.TransmissionType.Size = new System.Drawing.Size(186, 23);
             this.TransmissionType.TabIndex = 18;
+            this.TransmissionType.SelectedIndexChanged += new System.EventHandler(this.TransmissionType_SelectedIndexChanged);
             // 
             // button_Send
             // 
+            this.button_Send.Enabled = false;
             this.button_Send.Location = new System.Drawing.Point(71, 323);
             this.button_Send.Name = "button_Send";
             this.button_Send.Size = new System.Drawing.Size(123, 28);
             this.button_Send.TabIndex = 17;
             this.button_Send.Text = "Send";
             this.button_Send.UseVisualStyleBackColor = true;
+            this.button_Send.Click += new System.EventHandler(this.button_Send_Click);
             // 
             // label3
             // 
@@ -328,6 +340,7 @@ namespace MODBUS_Communicator
             this.Master_Arguments.Size = new System.Drawing.Size(187, 113);
             this.Master_Arguments.TabIndex = 4;
             this.Master_Arguments.Text = "";
+            this.Master_Arguments.TextChanged += new System.EventHandler(this.Master_Arguments_TextChanged);
             // 
             // label2
             // 
@@ -362,20 +375,22 @@ namespace MODBUS_Communicator
             this.Master_SlaveAddress.Size = new System.Drawing.Size(187, 22);
             this.Master_SlaveAddress.TabIndex = 0;
             this.Master_SlaveAddress.Text = "";
+            this.Master_SlaveAddress.TextChanged += new System.EventHandler(this.Master_SlaveAddress_TextChanged);
+            this.Master_SlaveAddress.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Master_SlaveAddress_KeyDown);
             // 
-            // tabPage2
+            // SlavePage
             // 
-            this.tabPage2.BackColor = System.Drawing.Color.Beige;
-            this.tabPage2.Controls.Add(this.label17);
-            this.tabPage2.Controls.Add(this.Slave_RecievedText);
-            this.tabPage2.Controls.Add(this.groupBox4);
-            this.tabPage2.Controls.Add(this.groupBox3);
-            this.tabPage2.Location = new System.Drawing.Point(4, 24);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(792, 422);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Slave";
+            this.SlavePage.BackColor = System.Drawing.Color.Beige;
+            this.SlavePage.Controls.Add(this.label17);
+            this.SlavePage.Controls.Add(this.Slave_RecievedText);
+            this.SlavePage.Controls.Add(this.groupBox4);
+            this.SlavePage.Controls.Add(this.groupBox3);
+            this.SlavePage.Location = new System.Drawing.Point(4, 24);
+            this.SlavePage.Name = "SlavePage";
+            this.SlavePage.Padding = new System.Windows.Forms.Padding(3);
+            this.SlavePage.Size = new System.Drawing.Size(792, 422);
+            this.SlavePage.TabIndex = 1;
+            this.SlavePage.Text = "Slave";
             // 
             // label17
             // 
@@ -390,6 +405,7 @@ namespace MODBUS_Communicator
             // 
             this.Slave_RecievedText.Location = new System.Drawing.Point(439, 25);
             this.Slave_RecievedText.Name = "Slave_RecievedText";
+            this.Slave_RecievedText.ReadOnly = true;
             this.Slave_RecievedText.Size = new System.Drawing.Size(345, 389);
             this.Slave_RecievedText.TabIndex = 10;
             this.Slave_RecievedText.Text = "";
@@ -409,6 +425,7 @@ namespace MODBUS_Communicator
             // 
             // buttonStartListening
             // 
+            this.buttonStartListening.Enabled = false;
             this.buttonStartListening.Location = new System.Drawing.Point(71, 323);
             this.buttonStartListening.Name = "buttonStartListening";
             this.buttonStartListening.Size = new System.Drawing.Size(123, 28);
@@ -464,11 +481,12 @@ namespace MODBUS_Communicator
             // 
             this.Slave_SlaveAddress.Location = new System.Drawing.Point(5, 41);
             this.Slave_SlaveAddress.Name = "Slave_SlaveAddress";
-            this.Slave_SlaveAddress.ReadOnly = true;
             this.Slave_SlaveAddress.Size = new System.Drawing.Size(156, 22);
             this.Slave_SlaveAddress.TabIndex = 17;
             this.Slave_SlaveAddress.TabStop = false;
             this.Slave_SlaveAddress.Text = "";
+            this.Slave_SlaveAddress.TextChanged += new System.EventHandler(this.Slave_SlaveAddress_TextChanged);
+            this.Slave_SlaveAddress.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Slave_SlaveAddress_KeyDown);
             // 
             // label10
             // 
@@ -486,15 +504,18 @@ namespace MODBUS_Communicator
             this.Slave_Port.Name = "Slave_Port";
             this.Slave_Port.Size = new System.Drawing.Size(155, 23);
             this.Slave_Port.TabIndex = 15;
+            this.Slave_Port.SelectedIndexChanged += new System.EventHandler(this.Slave_Port_SelectedIndexChanged);
             // 
             // buttonSlaveConnect
             // 
+            this.buttonSlaveConnect.Enabled = false;
             this.buttonSlaveConnect.Location = new System.Drawing.Point(7, 363);
             this.buttonSlaveConnect.Name = "buttonSlaveConnect";
             this.buttonSlaveConnect.Size = new System.Drawing.Size(155, 39);
             this.buttonSlaveConnect.TabIndex = 14;
             this.buttonSlaveConnect.Text = "Connect as Slave";
             this.buttonSlaveConnect.UseVisualStyleBackColor = true;
+            this.buttonSlaveConnect.Click += new System.EventHandler(this.buttonSlaveConnect_Click);
             // 
             // Slave_Time_Interval_Text
             // 
@@ -511,9 +532,9 @@ namespace MODBUS_Communicator
             this.label11.AutoSize = true;
             this.label11.Location = new System.Drawing.Point(6, 77);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(75, 15);
+            this.label11.Size = new System.Drawing.Size(102, 15);
             this.label11.TabIndex = 12;
-            this.label11.Text = "Time interval";
+            this.label11.Text = "Time interval [ms]";
             // 
             // Slave_Time_Interval_Bar
             // 
@@ -525,7 +546,9 @@ namespace MODBUS_Communicator
             this.Slave_Time_Interval_Bar.Size = new System.Drawing.Size(156, 45);
             this.Slave_Time_Interval_Bar.SmallChange = 10;
             this.Slave_Time_Interval_Bar.TabIndex = 13;
+            this.Slave_Time_Interval_Bar.TickFrequency = 10;
             this.Slave_Time_Interval_Bar.Value = 500;
+            this.Slave_Time_Interval_Bar.Scroll += new System.EventHandler(this.Slave_Time_Interval_Bar_Scroll);
             // 
             // MainWindow
             // 
@@ -536,8 +559,8 @@ namespace MODBUS_Communicator
             this.Name = "MainWindow";
             this.Text = "Modbus communicator";
             this.tabControl1.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
-            this.tabPage1.PerformLayout();
+            this.MasterPage.ResumeLayout(false);
+            this.MasterPage.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Master_Time_Interval_Bar)).EndInit();
@@ -545,8 +568,8 @@ namespace MODBUS_Communicator
             ((System.ComponentModel.ISupportInitialize)(this.Timeout_Bar)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            this.tabPage2.ResumeLayout(false);
-            this.tabPage2.PerformLayout();
+            this.SlavePage.ResumeLayout(false);
+            this.SlavePage.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.groupBox3.ResumeLayout(false);
@@ -559,8 +582,8 @@ namespace MODBUS_Communicator
         #endregion
 
         private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage MasterPage;
+        private System.Windows.Forms.TabPage SlavePage;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TrackBar Timeout_Bar;
         private System.Windows.Forms.GroupBox groupBox1;
