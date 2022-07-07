@@ -43,7 +43,8 @@ namespace MODBUS_Communicator
                     }
                     else if (message.Substring(3, 2).Equals("02"))
                     {
-                        parent.GetArguments();
+                        byte[] frame = ConvertToFrame(parent.GetArguments());
+                        this._serialPort.Write(frame, 0, frame.Length);
                     }
                     else parent.ChangeRecieved("No such instruction");
                 }
@@ -53,6 +54,34 @@ namespace MODBUS_Communicator
             {
                 parent.ChangeRecieved("An error occured in message transmission");
             }
+        }
+
+        private byte[] ConvertToFrame(string message)
+        {
+            string dataString = "";
+            if (int.Parse(this.Address) < 16) dataString += "0";
+            dataString += this.Address + "02";
+
+            if (message.Length > 252)
+                throw new Exception("The message is too long!");
+
+            dataString += message;
+
+            byte[] lrc = LRC(dataString);
+
+            string frameString = ":" + dataString;
+
+            byte[] frame = new byte[frameString.Length + 4];
+            for (int i = 0; i < frame.Length - 4; i++)
+            {
+                frame[i] = ASCIIEncoding.ASCII.GetBytes(frameString.ElementAt(i).ToString())[0];
+            }
+            frame[frame.Length - 4] = lrc[0];
+            frame[frame.Length - 3] = lrc[1];
+            frame[frame.Length - 2] = 13;
+            frame[frame.Length - 1] = 10;
+            if (!_serialPort.IsOpen) throw new Exception("Error: Serial port in not open!");
+            return frame;
         }
 
         private void Read()
@@ -71,6 +100,26 @@ namespace MODBUS_Communicator
 
                 }
             }
+        }
+        private byte[] LRC(string data)
+        {
+            byte uchLRC = 0;
+            int length = data.Length;
+
+            for (int i = 0; i < data.Length; i++)
+            {
+                uchLRC += ASCIIEncoding.ASCII.GetBytes(data.ElementAt(i).ToString())[0];
+            }
+            if (uchLRC < 15)
+            {
+                byte[] returnVal = new byte[2];
+                returnVal[1] = 0;
+                returnVal[0] = ASCIIEncoding.ASCII.GetBytes(uchLRC.ToString())[0];
+                return returnVal;
+            }
+            else
+                return ASCIIEncoding.ASCII.GetBytes(uchLRC.ToString());
+
         }
 
 

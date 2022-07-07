@@ -63,8 +63,10 @@ namespace MODBUS_Communicator
         #region Master Page
         private void Timeout_Bar_Scroll(object sender, EventArgs e)
         {
-            this.Timeout_Bar.Value = this.Timeout_Bar.Value - this.Timeout_Bar.Value % this.Timeout_Bar.SmallChange;
+            this.Timeout_Bar.Value -= this.Timeout_Bar.Value % this.Timeout_Bar.SmallChange;
             this.Timeout_Text.Text = this.Timeout_Bar.Value.ToString();
+            _serialPort.WriteTimeout = this.Timeout_Bar.Value;
+            _serialPort.ReadTimeout = this.Timeout_Bar.Value;
         }
 
         private void Master_Time_Interval_Bar_Scroll(object sender, EventArgs e)
@@ -130,6 +132,7 @@ namespace MODBUS_Communicator
                 this.whichInstruction.SelectedIndex = 0;
                 this.whichInstruction.Enabled = false;
             }
+            this.EnablingMasterSend();
         }
         private void button_Send_Click(object sender, EventArgs e)
         {
@@ -158,7 +161,7 @@ namespace MODBUS_Communicator
         private void EnablingMasterSend()
         {
             if (this.Master_Arguments.Text.Length > 0 &&
-                this.CheckSlaveAddress(this.Master_SlaveAddress.Text) &&
+                (this.CheckSlaveAddress(this.Master_SlaveAddress.Text) || this.TransmissionType.SelectedIndex == 1) &&
                 _serialPort.IsOpen) this.button_Send.Enabled = true;
             else this.button_Send.Enabled = false;
         }
@@ -232,7 +235,9 @@ namespace MODBUS_Communicator
 
         public string GetArguments()
         {
-            return "";
+            if(this.slaveListen)
+                return this.Slave_Arguments.Text;
+            return "Slave disallowed getting arguments";
         }
 
 

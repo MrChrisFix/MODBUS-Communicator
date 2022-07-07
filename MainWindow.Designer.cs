@@ -336,6 +336,7 @@ namespace MODBUS_Communicator
             // Master_Arguments
             // 
             this.Master_Arguments.Location = new System.Drawing.Point(7, 195);
+            this.Master_Arguments.MaxLength = 252;
             this.Master_Arguments.Name = "Master_Arguments";
             this.Master_Arguments.Size = new System.Drawing.Size(187, 113);
             this.Master_Arguments.TabIndex = 4;
@@ -447,6 +448,7 @@ namespace MODBUS_Communicator
             // 
             this.Slave_Arguments.Enabled = false;
             this.Slave_Arguments.Location = new System.Drawing.Point(6, 40);
+            this.Slave_Arguments.MaxLength = 252;
             this.Slave_Arguments.Name = "Slave_Arguments";
             this.Slave_Arguments.Size = new System.Drawing.Size(187, 175);
             this.Slave_Arguments.TabIndex = 4;
