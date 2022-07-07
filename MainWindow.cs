@@ -19,7 +19,9 @@ namespace MODBUS_Communicator
                 BaudRate = 9600,
                 Parity = Parity.Even,
                 StopBits = StopBits.One,
-                DataBits = 7
+                DataBits = 7,
+                ReadTimeout = 500,
+                WriteTimeout = 500
             };
             InitializeComponent();
             this.InitValues();
@@ -145,8 +147,12 @@ namespace MODBUS_Communicator
             }
             else
             {
-                this.Master_RecievedText.Text += "(" + this.Master_SlaveAddress.Text + ")" +
-                    master.Instruction2(this.Master_SlaveAddress.Text) + '\n';
+                string gottenText = master.Instruction2(this.Master_SlaveAddress.Text);
+                this.Master_RecievedText.Text += "(" + this.Master_SlaveAddress.Text + ": DEC)" + gottenText + '\n';
+                if(!gottenText.StartsWith("Error"))
+                    this.Master_RecievedText.Text += "(" + this.Master_SlaveAddress.Text + ": HEX)" +
+                    StringToHexConverter(gottenText) + '\n';
+
             }
         }
         private void Master_Arguments_TextChanged(object sender, EventArgs e)
@@ -160,7 +166,7 @@ namespace MODBUS_Communicator
 
         private void EnablingMasterSend()
         {
-            if (this.Master_Arguments.Text.Length > 0 &&
+            if ((this.Master_Arguments.Text.Length > 0 || this.whichInstruction.SelectedIndex == 1) &&
                 (this.CheckSlaveAddress(this.Master_SlaveAddress.Text) || this.TransmissionType.SelectedIndex == 1) &&
                 _serialPort.IsOpen) this.button_Send.Enabled = true;
             else this.button_Send.Enabled = false;
@@ -225,12 +231,25 @@ namespace MODBUS_Communicator
         public void ChangeRecieved(string message)
         {
             this.Slave_RecievedText.Text += "(Dec): "+ message + '\n';
+            if(!message.StartsWith("Error"))
+                this.Slave_RecievedText.Text += "(Hex): " + StringToHexConverter(message) + '\n';
 
+        }
+
+        public string StringToHexConverter(string message)
+        {
             byte[] ba = Encoding.Default.GetBytes(message);
             var hexString = BitConverter.ToString(ba);
-            //hexString = hexString.Replace("-", "");
-            this.Slave_RecievedText.Text += "(Hex): " + hexString + '\n';
-
+            hexString = hexString.Replace("-", "");
+            string hexString2 = "";
+            int i = 0;
+            foreach (char letter in hexString)
+            {
+                string hexOut = String.Format("{0:X}", Convert.ToInt32(letter));
+                hexString2 += "0x" + hexOut + " ";
+                if (i++ == 1) { hexString2 += "- "; i = 0; }
+            }
+            return hexString2;
         }
 
         public string GetArguments()

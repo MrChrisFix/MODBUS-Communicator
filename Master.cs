@@ -19,7 +19,7 @@ namespace MODBUS_Communicator
         public void Instruction1(string SlaveAddress, string message)
         {
             string dataString = "";
-            if (int.Parse(SlaveAddress) < 16) dataString += "0";
+            if (int.Parse(SlaveAddress) < 10) dataString += "0";
             dataString += SlaveAddress + "01";
 
             if(message.Length > 252)
@@ -47,7 +47,7 @@ namespace MODBUS_Communicator
         public string Instruction2(string SlaveAddress)
         {
             string dataString = "";
-            if (int.Parse(SlaveAddress) < 16) dataString += "0";
+            if (int.Parse(SlaveAddress) < 10) dataString += "0";
             dataString += SlaveAddress + "02";
             byte[] lrc = LRC(dataString);
             string frameString = ":" + dataString;
@@ -62,7 +62,16 @@ namespace MODBUS_Communicator
             frame[frame.Length - 2] = 13;
             frame[frame.Length - 1] = 10;
             if (!_serialPort.IsOpen) throw new Exception("Error: Serial port in not open!");
-            this._serialPort.Write(frame, 0, frame.Length);
+            try
+            {
+                this._serialPort.Write(frame, 0, frame.Length);
+            }
+            catch(TimeoutException)
+            {
+                return "Error: Write timeout!";
+            }
+            catch(Exception) { return "Error: Something went wrong!"; }
+
             string messageBack;
             
             try
@@ -74,6 +83,7 @@ namespace MODBUS_Communicator
             {
                return "Error: No message recieved";
             }
+            catch (Exception) { return "Error: Something went wrong!"; }
         }
 
         private byte[] CodeString(string message)
@@ -125,6 +135,33 @@ namespace MODBUS_Communicator
             }
 
             return "";
+        }
+
+
+        private void Write(int restransmissions, byte[] message)
+        {
+            if (!_serialPort.IsOpen) return;
+
+
+            int loopNr = 0;
+            while(restransmissions >= loopNr && _serialPort.IsOpen)
+            {
+                try
+                {
+                    _serialPort.Write(message, 0, message.Length);
+                    string confirmation = _serialPort.ReadLine();
+                    return;
+                }
+                catch(TimeoutException)
+                {
+                    loopNr++;
+                }
+                catch(Exception)
+                {
+
+                }
+            }
+            //Couldn't send
         }
     }
 }

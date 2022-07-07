@@ -59,7 +59,7 @@ namespace MODBUS_Communicator
         private byte[] ConvertToFrame(string message)
         {
             string dataString = "";
-            if (int.Parse(this.Address) < 16) dataString += "0";
+            if (int.Parse(this.Address) < 10) dataString += "0";
             dataString += this.Address + "02";
 
             if (message.Length > 252)
