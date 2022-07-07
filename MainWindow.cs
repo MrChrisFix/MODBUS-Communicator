@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO.Ports;
+using System.Text;
 using System.Windows.Forms;
 
 namespace MODBUS_Communicator
@@ -7,9 +8,19 @@ namespace MODBUS_Communicator
     public partial class MainWindow : Form
     {
         private SerialPort _serialPort;
+        private bool slaveListen = false;
+        private Master master;
+        private Slave slave;
+
         public MainWindow()
         {
-            _serialPort = new SerialPort();
+            _serialPort = new SerialPort
+            {
+                BaudRate = 9600,
+                Parity = Parity.Even,
+                StopBits = StopBits.One,
+                DataBits = 7
+            };
             InitializeComponent();
             this.InitValues();
         }
@@ -18,12 +29,14 @@ namespace MODBUS_Communicator
         {
             if (_serialPort.IsOpen)
                 _serialPort.Close();
+            this.master = null;
+            this.slave = null;
             base.OnClosed(e);
         }
 
         private void InitValues()
         {
-            this.TransmissionType.Items.Add("Address");
+            this.TransmissionType.Items.Add("Unicast");
             this.TransmissionType.Items.Add("Broadcast");
             this.TransmissionType.SelectedIndex = 0;
 
@@ -80,6 +93,7 @@ namespace MODBUS_Communicator
             if (this.buttonMasterConnect.Text == "Disconnect as Master")
             {
                 this.buttonMasterConnect.Text = "Connect as Master";
+                this.master = null;
                 _serialPort.Close();
                 return;
             }
@@ -91,6 +105,7 @@ namespace MODBUS_Communicator
                     if (!_serialPort.IsOpen) throw new Exception("Couldn't connect");
                     else
                     {
+                        this.master = new Master(_serialPort);
                         this.buttonMasterConnect.Text = "Disconnect as Master";
                     }
                 }
@@ -104,10 +119,32 @@ namespace MODBUS_Communicator
         private void TransmissionType_SelectedIndexChanged(object sender, EventArgs e)
         {
             this.Master_SlaveAddress.Enabled = this.TransmissionType.SelectedIndex == 0; //if index == 0 => true
+            if(this.TransmissionType.SelectedIndex == 0) // if Address
+            {
+                this.Master_SlaveAddress.Enabled = true;
+                this.whichInstruction.Enabled = true;
+            }
+            else
+            {
+                this.Master_SlaveAddress.Enabled = false;
+                this.whichInstruction.SelectedIndex = 0;
+                this.whichInstruction.Enabled = false;
+            }
         }
         private void button_Send_Click(object sender, EventArgs e)
         {
-            //TODO
+            if(this.whichInstruction.SelectedIndex ==0) //Ins 1
+            {
+                if(this.TransmissionType.SelectedIndex==0) //Address
+                    master.Instruction1(this.Master_SlaveAddress.Text, this.Master_Arguments.Text);
+                else
+                    master.Instruction1("0", this.Master_Arguments.Text);
+            }
+            else
+            {
+                this.Master_RecievedText.Text += "(" + this.Master_SlaveAddress.Text + ")" +
+                    master.Instruction2(this.Master_SlaveAddress.Text) + '\n';
+            }
         }
         private void Master_Arguments_TextChanged(object sender, EventArgs e)
         {
@@ -136,6 +173,7 @@ namespace MODBUS_Communicator
             if (this.buttonSlaveConnect.Text == "Disconnect as Slave")
             {
                 this.buttonSlaveConnect.Text = "Connect as Slave";
+                this.slave = null;
                 _serialPort.Close();
                 this.buttonStartListening.Enabled = false;
                 return;
@@ -150,6 +188,7 @@ namespace MODBUS_Communicator
                     {
                         this.buttonSlaveConnect.Text = "Disconnect as Slave";
                         this.buttonStartListening.Enabled = true;
+                        this.slave = new Slave(_serialPort, this, this.Slave_SlaveAddress.Text);
                     }
                 }
                 catch (Exception err)
@@ -180,9 +219,41 @@ namespace MODBUS_Communicator
             _serialPort.PortName = Slave_Port.SelectedItem.ToString();
         }
 
+        public void ChangeRecieved(string message)
+        {
+            this.Slave_RecievedText.Text += "(Dec): "+ message + '\n';
+
+            byte[] ba = Encoding.Default.GetBytes(message);
+            var hexString = BitConverter.ToString(ba);
+            //hexString = hexString.Replace("-", "");
+            this.Slave_RecievedText.Text += "(Hex): " + hexString + '\n';
+
+        }
+
+        public string GetArguments()
+        {
+            return "";
+        }
+
 
         #endregion
 
-        
+        private void buttonStartListening_Click(object sender, EventArgs e)
+        {
+            if(slaveListen)
+            {
+                this.slaveListen = false;
+                this.Slave_Arguments.Enabled = false;
+                this.buttonStartListening.Text = "Allow listening";
+            }
+            else
+            {
+                this.slaveListen = true;
+                this.Slave_Arguments.Enabled = true;
+                this.buttonStartListening.Text = "Disallow listening";
+            }
+
+            
+        }
     }
 }

@@ -430,8 +430,9 @@ namespace MODBUS_Communicator
             this.buttonStartListening.Name = "buttonStartListening";
             this.buttonStartListening.Size = new System.Drawing.Size(123, 28);
             this.buttonStartListening.TabIndex = 17;
-            this.buttonStartListening.Text = "Start listening";
+            this.buttonStartListening.Text = "Allow listening";
             this.buttonStartListening.UseVisualStyleBackColor = true;
+            this.buttonStartListening.Click += new System.EventHandler(this.buttonStartListening_Click);
             // 
             // label14
             // 
@@ -444,6 +445,7 @@ namespace MODBUS_Communicator
             // 
             // Slave_Arguments
             // 
+            this.Slave_Arguments.Enabled = false;
             this.Slave_Arguments.Location = new System.Drawing.Point(6, 40);
             this.Slave_Arguments.Name = "Slave_Arguments";
             this.Slave_Arguments.Size = new System.Drawing.Size(187, 175);
