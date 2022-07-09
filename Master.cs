@@ -86,6 +86,41 @@ namespace MODBUS_Communicator
             catch (Exception) { return "Error: Something went wrong!"; }
         }
 
+        private byte[] PrepareFrame(string message, string InstructionNumber, string Address)
+        {
+            if (message.Length > 252)
+                throw new Exception("The message is too long!");
+
+            int frameLength = 5 + message.Length * 2 + 4;
+            byte[] frame = new byte[frameLength];
+            frame[0] = this.StringToHex(":")[0];
+           /* if (int.Parse(Address) < 10) Address = "0" + Address;
+            if (int.Parse(Address) < 100) Address = "0" + Address;*/
+            byte[] addr = this.StringToHex(int.Parse(Address).ToString("X"));
+            if(addr.Length == 1)
+            {
+                frame[1] = StringToHex("0")[0];
+                frame[2] = addr[0];
+            }
+            else
+            {
+                frame[1] = addr[0];
+                frame[2] = addr[1];
+            }
+            byte[] instr = StringToHex(int.Parse(InstructionNumber).ToString("X"));
+            frame[3] = instr[0]; //Instrution is 1 or 2
+            frame[4] = instr[1];
+
+
+            return null;
+
+        }
+
+        private byte[] StringToHex(string data)
+        {
+            return Encoding.Default.GetBytes(data);
+        }
+
         private byte[] CodeString(string message)
         {
             return ASCIIEncoding.ASCII.GetBytes(message);
